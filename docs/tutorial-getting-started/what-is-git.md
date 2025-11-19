@@ -220,18 +220,19 @@ Here are a few ways:
    
     Let's suppose we have some code in the remote branch (not our local changes, the stuff online) we call commit A, and commit B is built from commit A. Now let's say we built our code, commit C, based on commit A. Then, when we try to push, we don't have commit B's changes, so the push is rejected. When we rebase during a pull, git will try to pretend our changes were built on commit B instead. If this succeeds, the git history will look like we built commit C from commit B, even though we started from commit A. It is not incredibly important, just know it makes commit history look a bit cleaner and is easy to try.
 4. resolve conflicts file by file: When there is a merge conflict when pulling, git will mark your files with two versions, the version stored locally and the incoming version from the remote branch you are trying to pull from. The markers will look like this:
-
-"<<<<<<<" HEAD
+```bash
+<<<<<<< HEAD
 
 Your local changes
 
-"======="
+=======
 
 Remote changes from origin/branch_name
 
-">>>>>>>" origin/branch_name
+>>>>>>> origin/branch_name
+```
 
-Merge the files how you see fit, then delete the file separators (the "=", "<" and ">")
+Merge the files how you see fit, then delete the file separators (the `=`, `<` and `>`)
 
 ### Last note
 
