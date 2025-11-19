@@ -187,7 +187,7 @@ The command to make a new branch is
 
 
 ```bash
-git branch -b "new_branch_name"
+git branch "new_branch_name"
 ```
 
 
@@ -204,13 +204,83 @@ After we push to a branch and are ready to merge our changes into the main branc
 
 You'll be asked to add a description of the PR when you go to make one (after you push and are ready to merge, on github.com). This should be a lengthy, descriptive documentation of what feature(s) were implemented, how and why. You should add anything additional you downloaded (dependencies) and describe why they are necessary. After your PR is reviewed, it will be merged into the main branch (your edits will be transfered over). 
 
-
+This is the happy path for version control. Ideally, this should be the end of the document. However, reality often disappoints. Merge conflicts will happen, making it important to understand what it means to have a merge conflict and knowing how to best resolve them.  
 
 ### The dreaded Merge Conflict
 
 
-
 Merge conflicts happen when github does not know how to resolve the differences between your version of the repository and the version online. This could happen because you edited a file and someone else did too, or because changes were made and you did not pull before you staged your commit and tried to push (always `git pull` before any `git add, commit or push`), or a bunch of other reasons. 
+
+This can feel scary, your merges are being **rejected** because there exists a conflict. Basic strategies include just deleting your version of the file and allowing it to be overwritten by the main branch's or the opposite, overwritting the main branch's code with your own. Now, this is not usually the way. 
+
+Here are a few ways:
+
+1. `git pull`: should always be your first instinct, and remember to always pull before you push.
+2. `git pull --rebase origin main`: we try to rebase instead of merging. Rebasing can be described best using an example:
+   
+    Let's suppose we have some code in the remote branch (not our local changes, the stuff online) we call commit A, and commit B is built from commit A. Now let's say we built our code, commit C, based on commit A. Then, when we try to push, we don't have commit B's changes, so the push is rejected. When we rebase during a pull, git will try to pretend our changes were built on commit B instead. If this succeeds, the git history will look like we built commit C from commit B, even though we started from commit A. It is not incredibly important, just know it makes commit history look a bit cleaner and is easy to try.
+4. resolve conflicts file by file: When there is a merge conflict when pulling, git will mark your files with two versions, the version stored locally and the incoming version from the remote branch you are trying to pull from. The markers will look like this:
+
+"<<<<<<<" HEAD
+
+Your local changes
+
+"======="
+
+Remote changes from origin/branch_name
+
+">>>>>>>" origin/branch_name
+
+Merge the files how you see fit, then delete the file separators (the "=", "<" and ">")
+
+### Last note
+
+If none of these work, try to ask for help. Running random git commands from an LLM could have unforseen side effects. You will not have permissions to be able to do permanent damage, any action you take can and might be reverted if needed. 
+It is okay and expected you make mistakes. That being said, **learn from them**. 
+
+import React from 'react';
+import confetti from 'canvas-confetti';
+
+
+
+export function ConfettiButton() {
+  const shoot = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    const audio = new Audio('/wuair_docs/audio/confetti.mp3');
+    audio.addEventListener('canplaythrough', () => audio.play());
+  };
+ const primaryBlue = "var(--ifm-color-primary)";
+  return (
+    <button
+      onClick={shoot}
+      style={{
+        marginLeft: '8px',           
+        padding: '4px 10px',         
+        backgroundColor: primaryBlue,
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '0.95rem',
+        display: 'inline-block',
+        verticalAlign: 'middle'
+      }}
+    >
+      have a prize
+    </button>
+  );
+}
+
+
+
+<p>
+  That was pretty intense! <ConfettiButton />
+</p>
+
 
 
 
