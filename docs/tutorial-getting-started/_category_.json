@@ -1,0 +1,8 @@
+{
+  "label": "Tutorial - Getting Started",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Set up guide to WUAIR development and software installation"
+  }
+}
