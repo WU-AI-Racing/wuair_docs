@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwuair_docs=globalThis.webpackChunkwuair_docs||[]).push([[990],{5079:a=>{a.exports=JSON.parse('{"metadata":{"permalink":"/wuair_docs/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
