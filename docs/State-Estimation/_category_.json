@@ -1,8 +1,8 @@
 {
-  "label": "Perception",
-  "position": 3,
+  "label": "State Estimation",
+  "position": 4,
   "link": {
     "type": "generated-index",
-    "description": "Perception team documentation and research"
+    "description": "State Estimation team documentation and research"
   }
 }

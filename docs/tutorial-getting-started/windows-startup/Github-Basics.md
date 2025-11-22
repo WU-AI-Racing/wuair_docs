@@ -53,4 +53,4 @@ git clone git@github.com:WU-AI-Racing/wuair_system.git
 cd wuair_system && git checkout windows_wsl # move to this branch, so we aren't using the linux version of files
 ```
 
-Damn, that was a lot of work. Don't worry, we're getting there. Move onto [Using Docker and ROS Intro](using-docker-plus-ros.mdx) after this page.
+Damn, that was a lot of work. Don't worry, we're getting there. Move onto [Using Docker and ROS Intro](using-docker-plus-ros.md) after this page.
