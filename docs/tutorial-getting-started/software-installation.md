@@ -1,8 +1,8 @@
 ---
-sidebar_position: 1
+sidebar_position: 6
 ---
 
-# Software Environment Installation
+# Linux Setup
 
 ROS2 Software must be run in Ubuntu Jammy (22.04). To enable everyone to implement their code without installing an entirely new operating system we will make use of Docker. This will create a Docker container on your computer that's running Ubuntu. 
 

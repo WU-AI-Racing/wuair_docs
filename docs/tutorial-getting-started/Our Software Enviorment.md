@@ -1,12 +1,16 @@
 ---
 
-sidebar_position: 3
+sidebar_position: 4
 
 ---
 
-# What is Docker?
+# Our Software Environment
 
-## Why Docker? What is Docker? Where is Docker?
+## How we use Docker and Git to develop code
+
+Now that you definitely read the [Git](/wuair_docs/docs/tutorial-getting-started/what-is-git), [Docker](/wuair_docs/docs/tutorial-getting-started/what-is-docker) and ROS tutorials :eyes: can show you how they are used within our environment. 
+
+
 To understand Docker, we first need to understand **containers** and their predecessor, **Virtual Machines** (VMs). Virtual Machines are simulated computers, using some mapping between the hardware on our real computer and the simulated hardware on the VM, to trick the VM into thinking it really is a real computer. This works, but it is computationally expensive to simulate an extra computer and OS  to run some simple commands. 
 
 

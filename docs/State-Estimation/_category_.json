@@ -1,0 +1,8 @@
+{
+  "label": "Perception",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Perception team documentation and research"
+  }
+}
