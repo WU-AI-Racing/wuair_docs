@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ## Cloning Repositories
 
-Once you have completed the [software installation guide](/docs/tutorial-getting-started/) and set up Git and Docker you can now begin getting started on writing you own code. Each department will have more detailed development guides but this will allow you to get started. 
+Once you have completed the software installation guide and set up Git and Docker you can now begin getting started on writing you own code. Each department will have more detailed development guides but this will allow you to get started. 
 
 Instead of using nested Git repos, called submodules, we use individual repositories for each department. To ensure each repository is up-to-date and using correct branch we will use **vcstool** to automate cloning and pulling.
 
