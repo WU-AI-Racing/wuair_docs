@@ -18,7 +18,7 @@ Instead of using nested Git repos, called submodules, we use individual reposito
 
 To get started you will need to set up an SSH key for github following [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). With the SSH key you can now import each repository in the WUAIR stack and ensure they are up to date. 
 
-After entering the `ros2_ws` [via Docker](/docs/tutorial-getting-started/intro) enter the `/src` directory. 
+After entering the `ros2_ws` [via Docker](/wuair_docs/docs/tutorial-getting-started/what-is-docker.md) enter the `/src` directory. 
 
 :::important 
 The /src directory is mounted in the docker container! This means that you can make changes to files within the `\src` on your local machine or within docker and it will remain the same between both.
