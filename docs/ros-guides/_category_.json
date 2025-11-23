@@ -1,8 +1,0 @@
-{
-  "label": "ROS guides",
-  "position": 7,
-  "link": {
-    "type": "generated-index",
-    "description": "Guides and information for using ROS"
-  }
-}
