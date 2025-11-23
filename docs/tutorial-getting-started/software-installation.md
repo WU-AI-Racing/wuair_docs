@@ -89,6 +89,11 @@ You should now be able to run the simulation with the following command.
 ros2 launch eufs_launcher eufs_launcher.launch.py
 ```
 
+:::tip Display error
+If you are getting a display error you can run the following command:
+`xhost +local:root`
+:::
+
 ### Developing in Docker
 
 Our system is set up with the `src` directory mounted from your local machine and the docker container. This allows you to make change to any repositories and code within them on your local machine in your IDE of choice (EX: VsCode) on your local computer and see those change live in the Docker container. After major changes you may need to rebuild the ROS workspace with:
