@@ -21,7 +21,7 @@ To get started you will need to set up an SSH key for github following [this gui
 After entering the `ros2_ws` via Docker enter the `/src` directory. 
 
 :::important 
-The /src directory is mounted in the docker container! This means that you can make changes to files within the `\src` on your local machine or within docker and it will remain the same between both.
+The /src directory is mounted in the docker container! This means that you can make changes to files within the `/src` on your local machine or within docker and it will remain the same between both.
 :::
 
 Next source ros with
@@ -29,14 +29,13 @@ Next source ros with
 . /opt/ros/humble/setup.bash
 ```
 
-Then clone your desired using `vcstool`. 
-Move to the source directory and import the `wuair.rosinstall` file:
+Then clone your the WUAIR stack using `vcstool` by moving to the `src` directory and importing repositors with:
 
 ```
 vcs import < wuair.rosinstall
 ```
 
-All the packages should now be imported into your source file. Your only need to run this command once. To update packages after this importing them run:
+All the packages should now be imported into your `/src` directory. Your only need to run this command when you want to clone the stack. To update packages after this importing them run:
 
 ```
 vcs pull src
@@ -48,10 +47,11 @@ This will pull only the main branch of each repository.
 
 
 
-To test code in experimental branches the best approach we currently have found it this to be the easiest method.
-Now in on you **local machine** 
-1. Delete the cloned repository you want work on. EX: `rm -fr perception_pkg`
-2. Clone the repository you want to work on EX: `git clone git@github.com:WU-AI-Racing/wuair_perception.git`
+#### To test code in experimental branches the best approach we currently have found the following.
+
+**On your local machine:** 
+1. Delete the repository you want work on. EX: `rm -fr perception_pkg`
+2. Clone the repository you want to work on using git EX: `git clone git@github.com:WU-AI-Racing/wuair_perception.git`
 3. Go to you desired experiment branch with `git checkout BRANCH-NAME`
 
 Then build the ros workspace with:
@@ -70,7 +70,7 @@ colcon build --symlink-install
 source /ros2_ws/install/setup.bash
 ```
 
-Now you should be able to edit files on your local machine and see the update in Docker. After editing files you should not need to rebuild every time because of the simlink, but for major changes you may need to rebuild.
+Now you should be able to edit files on your local machine and have them update in Docker. After editing files you do not need to rebuild every time because of the simlink, but for major changes or if using C++ you will need to rebuild.
 
 ## Running code 
 
