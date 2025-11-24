@@ -1,0 +1,116 @@
+---
+
+sidebar_position: 2
+
+---
+
+# PID Control
+
+A **PID controller** is a feedback control method used to make a system follow a desired value or trajectory. The name comes from its three components:
+
+- **P** — Proportional  
+- **I** — Integral  
+- **D** — Derivative  
+
+Each term is related to the error of the system.
+
+---
+
+## What Is "Error"?
+
+A PID controller continuously computes an error:
+
+![e(t) = r(t) - y(t)](https://latex.codecogs.com/svg.image?\color{white}e(t)=r(t)-y(t))
+
+where:
+
+- \(r(t)\) = setpoint (desired value)
+- \(y(t)\) = measurement (current value)
+
+The controller then uses this error to generate a control signal.
+
+---
+
+## The Three Terms
+
+### 1. Proportional Term (P)
+
+The proportional term is defined by the **current error**:
+
+![P_p(t) = K_p e(t)](https://latex.codecogs.com/svg.image?\color{white}P_p(t)=K_p%20e(t))
+
+- and a gain \(K_p\).  
+- Large \(K_p\) → fast response, but too large can cause oscillations.
+
+The intuition is to apply more control when the error is large and less when the state is close to the target.
+
+---
+
+### 2. Integral Term (I)
+
+The integral term reacts to **accumulated error**:
+
+![P_i(t) = K_i ∫₀ᵗ e(τ) dτ](https://latex.codecogs.com/svg.image?\color{white}P_i(t)=K_i\int_0^t%20e(\tau)\,d\tau)
+
+- Helps eliminate **steady-state error**.  
+- Too much integral gain can cause slow oscillations or drift.
+
+The controller effectively gains “memory” of past errors.
+
+---
+
+### 3. Derivative Term (D)
+
+The derivative term reacts to the **rate of change of error**:
+
+![P_d(t) = K_d de(t)/dt](https://latex.codecogs.com/svg.image?\color{white}P_d(t)=K_d\frac{de(t)}{dt})
+
+- Acts as damping to reduce overshoot.  
+- Helps predict error trends.
+
+**Intuition:** Slow down when approaching the target too fast.
+
+---
+
+## Full PID Formula
+
+Combining all three terms:
+
+![u(t) = K_p e(t) + K_i ∫₀ᵗ e(τ)dτ + K_d de(t)/dt](https://latex.codecogs.com/svg.image?\color{white}u(t)=K_p%20e(t)%20+%20K_i\int_0^t%20e(\tau)\,d\tau%20+%20K_d\frac{de(t)}{dt})
+
+This control signal \(u(t)\) is applied to the system continuously.
+
+---
+
+## Tuning PID
+
+Common strategies:
+
+1. Start with **P only**; increase until oscillation starts, then reduce.
+2. Add **D** to damp oscillations.
+3. Add **I** last to remove steady-state error.
+
+Automated tuning methods also exist (e.g., Ziegler–Nichols).
+
+---
+
+## Why PID?
+
+They are popular because they are:
+
+- Simple  
+- Stable  
+- Easy to tune  
+- Widely understood  
+
+---
+
+## Closing Remarks, other Resources
+
+With this control law, given good choices for our weights (K_p, K_i, K_d), we can control a system to our setpoint using this intuitive formulation.
+
+Here are some resources for further reading:
+
+- [Basic overview of PID](https://www.youtube.com/watch?v=wkfEZmsQqiA)  
+- [Addressing the Weaknesses of PID, Anti-Windup](https://www.youtube.com/watch?v=NVLXCwc8HzM)
+

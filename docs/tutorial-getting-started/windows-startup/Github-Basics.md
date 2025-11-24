@@ -15,7 +15,7 @@ Make sure you are in WSL land for this. As a reminder, this is done via running 
 Make a new directory for wuair code. 
 ```bash
 mkdir ~/wuair
-cd wuair
+cd ~/wuair
 ```
 
 Clone the system repository, enter it and go to this branch of the repo. To do so (and to set up for later git automation) we will be using Github SSH keys. 
@@ -31,7 +31,7 @@ skip this if you have already generated and added an SSH key to your Github and 
 
 We won't be sharing the actual private key with the docker container, so security risks are minimal with this method.
 
-1. To generate an SSH key, make sure you are following the **Linux** instructions and **using wsl**. For maximal convenience, name your key "git_key" (to match subsequent commands) and do not add a passphrase. **This is not security advice, do not do this in real life**, we should **never use this key in any public facing automation**. You have been warned. Follow [this tutorial](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux) to generate the key. 
+1. To generate an SSH key, make sure you are following the **Linux** instructions and **using wsl**. For maximal convenience, name your key "git_key" (e.g. /home/YOUR_USERNAME_HERE/.ssh/git_key) and do not add a passphrase. **This is not security advice, do not do this in real life**, we should **never use this key in any public facing automation**. You have been warned. Follow [this tutorial](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux) to generate the key. 
 2. To add the SSH key to your Github Account, use [this tutorial](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) (again use the Linux tutorial, remember our key is named git_key, so replace any "id_somenumber" with "git_key").
 
 ## Creating the SSH Agent

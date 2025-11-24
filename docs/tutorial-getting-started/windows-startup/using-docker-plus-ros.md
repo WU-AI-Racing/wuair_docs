@@ -26,6 +26,7 @@ invalid spec: :/ssh-agent: empty section between colons
 ```
 don't panic or ignore it. This is one of those times warnings matter. go back to **Your first SSH key** and redo steps 3 and 4. If they both act as expected, retry the above command. If you still get a warning, reach out.
 
+If you get a permissions denied error, try restarting your terminal and/or docker desktop. If the error persists, restart your computer. Docker Desktop can be finicky.
 :::
 
 Then run the container with
@@ -89,6 +90,11 @@ You should now be able to run the simulation with the following command:
 ```bash
 ros2 launch eufs_launcher eufs_launcher.launch.py
 ```
+
+:::danger[Important Warning part 2]
+If you get a rendering error or other significant error output restart your computer. Docker Desktop can be finicky, again.
+:::
+
 From here, press the checkbox that says something like Gazebo in the options, then press launch.
 This should get you a new set of guis, one is a controller and the other two are visualization. 
 
