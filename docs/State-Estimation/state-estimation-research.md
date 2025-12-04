@@ -15,7 +15,7 @@ Please add any research you come across! Use the same formatting as below and pl
 
 ## General Overview
 The Image below shows our place in the greater system diagram. Our job is to take in the positions of the cones and output a map of the track and the vehicles current position and trajectory. This first requires estimating our current velocity, which we will do by combining the data from our sensors using a Kalman Filtering. We will then use that velocity estimation in our SLAM implementation. 
-![System Diagram with SLAM Highlighted](/WU-AI-Racing/wuair_docs/static/img/SLAMHighlight_Sytem.png "System Overview")
+![System Diagram with SLAM Highlighted](/wuair_docs/static/img/SLAMHighlight_Sytem.png "System Overview")
 
 ## References
 
