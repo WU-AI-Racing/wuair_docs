@@ -18,7 +18,7 @@ Please add any research you come across! Use the same formatting as below and pl
 
 ## General Overview
 The Image below shows our place in the greater system diagram. Our job is to take in the positions of the cones and output a map of the track and the vehicles current position and trajectory. This first requires estimating our current velocity, which we will do by combining the data from our sensors using a Kalman Filtering. We will then use that velocity estimation in our SLAM implementation. 
-!(SLAMHighlight_Sytem "System Overview")
+!(SLAMHighlight_Sytem.png "System Overview")
 
 ## 2. Advanced Mapping Techniques
 **Liu, C., Zhang, G., Rong, Y., Shao, W., Meng, J., Li, G., & Huang, Y. (2023).** *Hybrid metric-feature mapping based on camera and Lidar sensor fusion.* Measurement, 207, 112411. [https://doi.org/10.1016/j.measurement.2022.112411](https://doi.org/10.1016/j.measurement.2022.112411)
