@@ -15,7 +15,7 @@ Please add any research you come across! Use the same formatting as below and pl
 
 ## General Overview
 The Image below shows our place in the greater system diagram. Our job is to take in the positions of the cones and output a map of the track and the vehicles current position and trajectory. This first requires estimating our current velocity, which we will do by combining the data from our sensors using a Kalman Filtering. We will then use that velocity estimation in our SLAM implementation. 
-![System Diagram with SLAM Highlighted](def)
+![System Diagram with SLAM Highlighted](/image/SLAMHighlight_Sytem.png "System Overview")
 
 ## References
 
@@ -50,5 +50,3 @@ The Image below shows our place in the greater system diagram. Our job is to tak
 
 * **Overview:** A clean Python implementation of the grid-based FastSLAM algorithms. While we will likely use C++ for the production car, this repository is excellent for simulating and understanding the underlying particle-filter logic used in packages like `gmapping`.
 
-
-[def]: SLAMHighlight_Sytem.png "System Overview"
