@@ -18,7 +18,7 @@ Please add any research you come across! Use the same formatting as below and pl
 
 ## General Overview
 The Image below shows our place in the greater system diagram. Our job is to take in the positions of the cones and output a map of the track and the vehicles current position and trajectory. This first requires estimating our current velocity, which we will do by combining the data from our sensors using a Kalman Filtering. We will then use that velocity estimation in our SLAM implementation. 
-![System Diagram with SLAM Highlighted](SLAMHighlight_Sytem.png "System Overview")
+![System Diagram with SLAM Highlighted][def]
 
 ## 2. Advanced Mapping Techniques
 **Liu, C., Zhang, G., Rong, Y., Shao, W., Meng, J., Li, G., & Huang, Y. (2023).** *Hybrid metric-feature mapping based on camera and Lidar sensor fusion.* Measurement, 207, 112411. [https://doi.org/10.1016/j.measurement.2022.112411](https://doi.org/10.1016/j.measurement.2022.112411)
@@ -39,3 +39,6 @@ The Image below shows our place in the greater system diagram. Our job is to tak
 **Wu, Y. (2023).** *FastSLAM: Grid-based FastSLAM1.0 and FastSLAM2.0 algorithms.* GitHub Repository. [https://github.com/yingkunwu/FastSLAM](https://github.com/yingkunwu/FastSLAM)
 
 * **Overview:** A clean Python implementation of the grid-based FastSLAM algorithms. While we will likely use C++ for the production car, this repository is excellent for simulating and understanding the underlying particle-filter logic used in packages like `gmapping`.
+
+
+[def]: SLAMHighlight_Sytem.png "System Overview"
