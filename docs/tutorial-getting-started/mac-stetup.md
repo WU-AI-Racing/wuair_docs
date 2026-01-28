@@ -86,7 +86,7 @@ You will have full access to the ROS2 XFCE desktop environment.
 After connecting via VNC:
 
 1. Open a terminal in the container.
-2. Source ROS2 setup scripts for useful aliases:
+2. For useful aliases run `source src/.rosbashrc.sh`. That will give you the following short-cut commands:
 
 ```
 alias .r='source /opt/ros/humble/setup.bash'
@@ -118,6 +118,9 @@ alias tm='tmux attach || tmux'
 colcon build --symlink-install
 .w
 ```
+
+> **Note:** If you see a lot of warning message don't worry. Ignore them and move onto launching the simulation.
+
 
 4. Launch the simulation:
 
