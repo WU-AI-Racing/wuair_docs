@@ -92,6 +92,15 @@ ros2 launch eufs_launcher eufs_launcher.launch.py
 :::tip Display error
 If you are getting a display error you can run the following command:
 `xhost +local:root`
+
+If you get the error `environment variable 'EUFS_MASTER' does not exist` run:
+```
+unset AMENT_PREFIX_PATH
+
+export EUFS_MASTER=/ros2_ws/src/eufs_sim
+
+source install/setup.bash
+```
 :::
 
 ### Developing in Docker
