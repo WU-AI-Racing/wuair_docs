@@ -52,9 +52,9 @@ The `/src` folder is connected both to your local computer and to the Docker con
 
 Next start the docker container as described in your operating systems respective guides:
 
-* [Windows](tutorial-getting-started/windows-startup)
-* [Linux]
-* [Mac]
+* [Windows](/wuair_docs/docs/category/windows-setup)
+* [Linux](/wuair_docs/docs/tutorial-getting-started/software-installation)
+* [Mac](/wuair_docs/docs/tutorial-getting-started/mac-stetup)
 
 Once you have started the Docker container you are ready to go and can move on to running and writing code!
 
