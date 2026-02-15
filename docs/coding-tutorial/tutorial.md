@@ -132,7 +132,7 @@ Now you can run any of the nodes as follows:
 
 * Perception: `ros2 run perception_pkg perception`
 
-* State estimation: `ros2 launch state_estimation_pkg estimation.launch.py`
+* State estimation: `ros2 launch state_estimation_pkg slam_launch.py`
 
 * Path planning: `ros2 run path_planning_pkg planner`
 
