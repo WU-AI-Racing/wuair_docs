@@ -14,21 +14,21 @@ nonlinear set of dynamics using both MATLAB syms and a manual method:
 We are some system described by the following equation, for state ![x](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dx)
 and input ![u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Du):
 
-![\dot x = f(x,u)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\dot%7Bx%7D=f(x,u))
+![xdot = f(x,u)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\dot%7Bx%7D=f(x,u))
 
 where our linearization is defined, about a linearization point
-![(x_0,u_0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(x_0,u_0)):
+![(x0,u0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(x_0,u_0)):
 
-![\dot x \approx f + jacobians](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\dot%7Bx%7D(x,u)\approx%20f(x_0,u_0)+\left.\frac%7B\partial%20f%7D%7B\partial%20x%7D\right\vert_%7Bx_0,u_0%7D(x-x_0)+\left.\frac%7B\partial%20f%7D%7B\partial%20u%7D\right\vert_%7Bx_0,u_0%7D(u-u_0))
+![xdot approx f plus jacobians](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\dot%7Bx%7D(x,u)\approx%20f(x_0,u_0)+\left.\frac%7B\partial%20f%7D%7B\partial%20x%7D\right\vert_%7Bx_0,u_0%7D(x-x_0)+\left.\frac%7B\partial%20f%7D%7B\partial%20u%7D\right\vert_%7Bx_0,u_0%7D(u-u_0))
 
-The jacobians are redefined to be ![A(x_0,u_0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DA(x_0,u_0)) and ![B(x_0,u_0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DB(x_0,u_0)) in
+The jacobians are redefined to be ![A(x0,u0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DA(x_0,u_0)) and ![B(x0,u0)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DB(x_0,u_0)) in
 order of appearance. We can then group terms and define
-![\Delta x, \Delta u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(\Delta%20x,\Delta%20u):=(x-x_0,u-u_0)), such that:
+![Delta x, Delta u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(\Delta%20x,\Delta%20u):=(x-x_0,u-u_0)), such that:
 
-![\Delta \dot x = A\Delta x + B\Delta u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\Delta\dot%7Bx%7D=A\Delta%20x+B\Delta%20u)
+![Delta xdot = A Delta x + B Delta u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\Delta\dot%7Bx%7D=A\Delta%20x+B\Delta%20u)
 
 Note the linearity of the derivative, such that
-![\frac{d\Delta x}{dt} = \Delta \frac{dx}{dt}](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\frac%7Bd\Delta%20x%7D%7Bdt%7D=\Delta\frac%7Bdx%7D%7Bdt%7D).
+![d(Delta x)/dt = Delta dx/dt](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\frac%7Bd\Delta%20x%7D%7Bdt%7D=\Delta\frac%7Bdx%7D%7Bdt%7D).
 
 ## full state feedback
 ### Definitions
@@ -36,10 +36,10 @@ I will assume you have seen or understand the prior definitions for the
 linearization of our nonlinear dynamics. Given them, we define full
 state feedback as such:
 
-![u = -K^Tx](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Du=-K^Tx\implies\Delta\dot%7Bx%7D=(A-BK^T)\Delta%20x)
+![u = -KTx implies Delta xdot = (A-BKT) Delta x](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Du=-K^Tx\implies\Delta\dot%7Bx%7D=(A-BK^T)\Delta%20x)
 
-It should be noted ![u_0 = -K^Tx_0](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Du_0=-K^Tx_0) implies ![\Delta u = -K^T\Delta x](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\Delta%20u=-K^T\Delta%20x).
-The matrix ![A-BK^T](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DA-BK^T)'s eigenvalues decide directly the settling time
+It should be noted ![u0 = -KTx0](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Du_0=-K^Tx_0) implies ![Delta u = -KT Delta x](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\Delta%20u=-K^T\Delta%20x).
+The matrix ![A-BKT](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DA-BK^T)'s eigenvalues decide directly the settling time
 and stability margins for our linear system. Because our system is
 heavily nonlinear and MIMO (Multiple Input, Multiple Output), we cannot
 simply solve for the eigenvalues and remain computationally efficient.
@@ -66,4 +66,3 @@ function getNewControl(f,x)
 [ode45 MATLAB help page](https://www.mathworks.com/help/matlab/ref/ode45.html)
 
 [Pole Placement MATLAB Tutorial (Eigenvalue Manipulation)](https://www.youtube.com/watch?v=FXSpHy8LvmY)
-```
