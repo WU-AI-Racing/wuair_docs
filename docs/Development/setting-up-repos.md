@@ -84,3 +84,8 @@ To run components individually (after building) use the following command with y
 ```
 ros2 run wuair_control ros
 ```
+
+
+```
+ros2 run wuair_launcher gui
+```

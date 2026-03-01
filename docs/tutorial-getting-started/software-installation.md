@@ -131,3 +131,12 @@ To test code in experimental branches the best approach we currently have found 
 1. Delete the cloned repository you want work on. EX: `rm -fr perception_pkg`
 2. Clone the repository you want to work on EX: `git clone git@github.com:WU-AI-Racing/wuair_system.git`
 3. make change to that repository in your branch.
+
+
+## Runnning WUAIR stack
+
+Use the GUI launcher or launch individual nodes:
+
+```
+ros2 run wuair_launcher gui
+```

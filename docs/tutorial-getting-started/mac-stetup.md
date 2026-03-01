@@ -127,3 +127,9 @@ colcon build --symlink-install
 ```
 ros2 launch eufs_launcher eufs_launcher.launch.py
 ```
+
+5. Launch WUAIR file:
+
+```
+ros2 run wuair_launcher gui
+```

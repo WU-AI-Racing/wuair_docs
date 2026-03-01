@@ -95,6 +95,11 @@ ros2 launch eufs_launcher eufs_launcher.launch.py
 If you get a rendering error or other significant error output restart your computer. Docker Desktop can be finicky, again.
 :::
 
+To launch using the WUAIR stack using the GUI
+```
+ros2 run wuair_launcher gui
+```
+
 From here, press the checkbox that says something like Gazebo in the options, then press launch.
 This should get you a new set of guis, one is a controller and the other two are visualization. 
 
