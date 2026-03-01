@@ -1,0 +1,279 @@
+---
+sidebar_position: 6
+---
+# Model Predictive Control
+## What is it?
+### Basic overview
+ Model Predictive Control (MPC) is a method of control that essentially simulates a short time into the future, and chooses the inputs that produce the best future. This relies on two things: the dynamics of the system, and the optimization constraints.
+ 
+ The dyamics of the system are what allow it to simulate possible futures. The more accurate the dynamics, the more accurate the simulated future will be. However, the more complex the dynamics are, the more computationally expensive it will be to run the simulations and optimization. Our system is heavily nonlinear, which means it will be very complex.
+
+ The optimization constraints determine which future will be chosen. The constraints inform the system about which inputs are possible, and which outputs are ideal. For example, the constraints might say that keeping the car close to the path is good,  going fast is good, and hitting cones is bad. Then, the most optimal future will be one that stays close to the path while driving fast and not hitting any cones.
+
+We will be using the dynamics and optimization constraints described in [this](https://arxiv.org/pdf/1905.05150) paper.
+### Videos
+The first five videos in this series by MATLAB explains MPC conceptually: [MPC videos by MATLAB](https://www.youtube.com/playlist?list=PLn8PRpmsu08ozoeoXgxPSBKLyd4YEHww8)
+
+This video goes more in-depth about MPC: [MPC video by Steve Brunton](https://www.youtube.com/watch?v=YwodGM2eoy4)
+
+## Dynamics
+The dynamics of the car are modeled as a dynamic bicycle model with nonlinear tire force laws. The model holds under four assumptions: the vehicle drives on a flat surface, load transfer can be neglected, combined slip can be neglected, and the longitudinal drive-train forces can be neglected.
+
+The final system dyanmics consists of the linear combination of two different models, a dynamical model and a kinematic model. This is because the dynamical model is not accurate at low speeds due to [slip angles](https://en.wikipedia.org/wiki/Slip_angle). Similarly, the kinematic model is not accurate at high speeds because they neglect the interaction between the tires and ground. A linear combination of the two models allows both models to be used in their ideal regions.
+
+### Dynamical model
+The dynamical model is accurate at high speeds:
+
+![alt dyn eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctilde%7Bf%7D_%7B%5Ctext%7Bdyn%7D%7D(%5Ctilde%7B%5Cmathbf%7Bx%7D%7D,%5Ctilde%7B%5Cmathbf%7Bu%7D%7D)=%5Cbegin%7Bbmatrix%7D%5Cdot%7BX%7D%5C%5C%5Cdot%7BY%7D%5C%5C%5Cdot%7B%5Cvarphi%7D%5C%5C%5Cdot%7Bv%7D_x%5C%5C%5Cdot%7Bv%7D_y%5C%5C%5Cdot%7Br%7D%5Cend%7Bbmatrix%7D=%5Cbegin%7Bbmatrix%7Dv_x%5Ccos%7B%5Cvarphi%7D-v_y%5Csin%7B%5Cvarphi%7D%5C%5Cv_x%5Csin%7B%5Cvarphi%7D&plus;v_y%5Ccos%7B%5Cvarphi%7D%5C%5Cr%5C%5C%5Cfrac%7B1%7D%7Bm%7D(F_%7BR,x%7D-F_%7BF,y%7D%5Csin%7B%5Cdelta%7D&plus;m%20v_y%20r)%5C%5C%5Cfrac%7B1%7D%7Bm%7D(F_%7BR,y%7D&plus;F_%7BF,y%7D%5Ccos%7B%5Cdelta%7D-m%20v_x%20r)%5C%5C%5Cfrac%7B1%7D%7BI_z%7D(F_%7BF,y%7Dl_F%5Ccos%7B%5Cdelta%7D-F_%7BR,y%7Dl_R&plus;%5Ctau_%7B%5Ctext%7BTV%7D%7D)%5C%5C%5Cend%7Bbmatrix%7D)
+
+The states and parameters are defined [here](#Variables-and-parameters).
+
+<br>
+
+### Kinematic model
+The kinematic model is accurate at low speeds. Note how it uses both ![utilde](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctilde%7Bu%7D) and ![utildedot](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7B%5Ctilde%7Bu%7D%7D) as inputs:
+
+![alt kin eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctilde%7Bf%7D_%7B%5Ctext%7Bkin%7D%7D(%5Ctilde%7B%5Cmathbf%7Bx%7D%7D,%5Ctilde%7B%5Cmathbf%7Bu%7D%7D,%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bu%7D%7D%7D)=%5Cbegin%7Bbmatrix%7D%5Cdot%7BX%7D%5C%5C%5Cdot%7BY%7D%5C%5C%5Cdot%7B%5Cvarphi%7D%5C%5C%5Cdot%7Bv%7D_%7Bx%7D%5C%5C%5Cdot%7Bv%7D_%7By%7D%5C%5C%5Cdot%7Br%7D%5Cend%7Bbmatrix%7D=%5Cbegin%7Bbmatrix%7Dv_x%5Ccos%7B%5Cvarphi%7D-v_y%5Csin%7B%5Cvarphi%7D%5C%5Cv_x%5Csin%7B%5Cvarphi%7D&plus;v_y%5Ccos%7B%5Cvarphi%7D%5C%5Cr%5C%5C%5Cfrac%7BF_x%7D%7Bm%7D%5C%5C(%5Cdot%7B%5Cdelta%7Dv_x&plus;%5Cdelta%5Cdot%7Bv%7D_x)%5Cfrac%7Bl_R%7D%7Bl_R&plus;l_F%7D%5C%5C(%5Cdot%7B%5Cdelta%7Dv_x&plus;%5Cdelta%5Cdot%7Bv%7D_x)%5Cfrac%7B1%7D%7Bl_R&plus;l_F%7D%5C%5C%5Cend%7Bbmatrix%7D%5C;)
+
+The states and parameters are defined [here](#Variables-and-parameters).
+
+<br>
+
+
+### Blended model
+The final model is given by a linear combination of the dynamical model and kinematic model. At high speeds, the entire dynamical model will be used. At low speeds, the entire kinematic model will be used. In between, a mix of the dynamical and kinematic model will be used:
+
+![alt final eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bx%7D%7D%7D=%5Clambda%5Ctilde%7Bf%7D_%7B%5Ctext%7Bdyn%7D%7D(%5Ctilde%7B%5Cmathbf%7Bx%7D%7D,%5Ctilde%7B%5Cmathbf%7Bu%7D%7D)&plus;(1-%5Clambda)%5Ctilde%7Bf%7D_%7B%5Ctext%7Bkin%7D%7D(%5Ctilde%7B%5Cmathbf%7Bx%7D%7D,%5Ctilde%7B%5Cmathbf%7Bu%7D%7D,%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bu%7D%7D%7D)=%5Ctilde%7Bf%7D(%5Ctilde%7B%5Cmathbf%7Bx%7D%7D,%5Ctilde%7B%5Cmathbf%7Bu%7D%7D,%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bu%7D%7D%7D)%5C,%5Cnonumber%5C%5C)
+
+![lambda](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Clambda)  is a blending parameter defined [here](#Variables-and-parameters).
+
+<br>
+
+### Variables and parameters
+For reference, here is an image of the bicycle model with all parameters. You don't need to understand everything about it, but it can be useful to look at.
+
+![Bicycle model](/img/bicycle_model.png)
+
+The state of the model is ![xtilde = [X, Y, phi, vx, vy, r]^T](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctilde%7B%5Cmathbf%7Bx%7D%7D=%5BX,Y,%5Cvarphi,v_x,v_y,r%5D%5ET). The individual states are defined as:
+
+- ![(X, Y)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(X,Y)), the 2D coordinates of the center of the car
+- ![phi](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cvarphi), the heading of the car
+- ![vx](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dv_x), the x (longitudal) velocity of the center of the car
+- ![vy](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dv_y), the y (lateral) velocity of the center of the car
+- ![r](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dr), the yaw rate (angular velocity) of the car
+
+<br>
+
+The control input is ![utilde = [delta, D]^T](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctilde%7B%5Cmathbf%7Bu%7D%7D=%5B%5Cdelta,D%5D%5ET). The individual inputs are defined as:
+- ![delta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdelta), the steering angle
+- ![D in [-1, 1]](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DD\in[-1,1]), the driving command. 1 for full throttle, -1 for full braking
+
+<br>
+
+Note that the kinematic model depends on ![utildedot](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7B%5Ctilde%7Bu%7D%7D). We discretize ![utildedot = del utilde](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bu%7D%7D%7D=%5CDelta%5Ctilde%7B%5Cmathbf%7Bu%7D%7D), where ![del utilde = [del D, del delta]^T](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5CDelta%5Ctilde%7B%5Cmathbf%7Bu%7D%7D=%5B%5CDelta%20D,%5CDelta%5Cdelta%5D%5ET). In the optimization problem, it is assumed that we can only control ![del utilde](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5CDelta%5Ctilde%7B%5Cmathbf%7Bu%7D).
+
+
+<br>
+
+The parameters used in the dynamical and kinematic models are as follows:
+- ![m](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dm), the mass of the car
+
+- ![m](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DI_z), the intertia
+
+- ![l_r](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dl_r), the distance from the center of gravity to the rear wheel
+
+- ![l_f](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dl_f), the distance from the center of gravity to the front wheel
+
+<br>
+
+
+- ![F_R,y](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_{R,y}), the lateral tire force of the rear wheel
+    - ![F_R,y eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_%7BR,y%7D=D_R%5Csin%7B%5CBig(C_R%5Carctan%7B%5CBig(B_R%5Calpha_R%5CBig)%7D%5CBig)%7D)
+        - ![alpha_R eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Calpha_R=%5Carctan%7B%5CBig(%5Cfrac%7Bv_y-l_R%20r%7D%7Bv_x%7D%5CBig)%7D), the rear slip angle
+        - ![B_R, C_R, D_R](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DB_R,C_R,D_R) are experimentally identified coefficients
+
+<br> 
+
+- ![F_F,y](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_{R,y}), the lateral tire force of the front wheel
+    - ![F_F,y eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_%7BF,y%7D=D_F%5Csin%7B%5CBig(C_F%5Carctan%7B%5CBig(B_F%5Calpha_F%5CBig)%7D%5CBig)%7D)
+
+        - ![alpha_F eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Calpha_F=%5Carctan%7B%5CBig(%5Cfrac%7Bv_y&plus;l_F%20r%7D%7Bv_x%7D%5CBig)%7D-%5Cdelta), the front slip angle
+
+        - ![B_F, C_F, D_F](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DB_F,C_F,D_F) are experimentally identified coefficients
+
+<br>
+
+
+- ![F_x](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_x), the longitudinal combined force produced by the drivetrain
+    - ![F_x = C_m D - C_r0 - C_r2 v_x^2](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_%7Bx%7D=C_%7Bm%7DD-C_%7Br0%7D-C_%7Br2%7Dv_x%5E2)
+
+        - ![C_m D](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DC_mD), the experimentally identified motor model
+
+        - ![C_r9](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DC_{r0}), the experimentally identified rolling resistance
+
+        - ![C_{r2}](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DC_{r2}), the experimentally identified drag coeficcient
+
+<br>
+
+- ![tau_TV](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D\tau_{TV}), the additional moment produced by the torque vectoring system
+
+    - ![tau_TV = (r_target - r)P_TV](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctau_%7B%5Ctext%7BTV%7D%7D=(r_%7B%5Ctext%7Btarget%7D%7D-r)P_%7B%5Ctext%7BTV%7D%7D)
+
+        - ![r_target = delta(v_x / l_F + l_R](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dr_%7B%5Ctext%7Btarget%7D%7D=%5Cdelta%5Cfrac%7Bv_x%7D%7Bl_F&plus;l_R%7D), the kinematic yaw rate
+
+        - ![P_TV](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DP_{TV}), the proportional gain of the low level torque vectoring controller
+
+<br>
+
+- ![lambda](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Clambda), the blending parameter
+
+    - ![alt blend eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Clambda=%5Ctext%7Bmin%7D%5Cleft(%5Ctext%7Bmax%7D%5Cleft(%5Cfrac%7Bv_x-v_%7Bx,%5Ctext%7Bblend%20min%7D%7D%7D%7Bv_%7Bx,%5Ctext%7Bblend%20max%7D%7D-v_%7Bx,%5Ctext%7Bblend%20min%7D%7D%7D,0%5Cright),1%5Cright))
+        
+        - ![v_x,blend min](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dv_%7Bx,%5Ctext%7Bblend%20min%7D%7D), the velocity below which the kinematic modely is purely used. Determined to be 3 m/s
+
+        - ![v_x,blend max](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dv_%7Bx,%5Ctext%7Bblend%20max%7D%7D), the velocity above which the dynamical modely is purely used. Determined to be 5 m/s
+
+<br>
+
+## Optimization
+The final optimization problem will be structured as a [constrained optimization problem](https://en.wikipedia.org/wiki/Constrained_optimization). This means that there will be an objective function that will be minimized, subject to contstraints.
+
+ The objective function will be constructed from several cost functions, which each govern a part of how we choose the optimal solution. As evidenced by the name, the higher the cost function is, the worse our car is performing, which is why we try to minimize the cost. 
+
+The constraints will mostly be physical constraints that our car is subject to, such as the maximum force the tires can exert and the limits of the track (cones).
+
+
+### Contouring formulation
+The goal of the contouring formulation is to follow the path given to us as closely as possible. It is assumed that the path is given by a function that allows us to compute a point on the path ![(X_ref(theta),Y_ref(theta))](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(X_%7B%5Ctext%7Bref%7D%7D(%5Ctheta),Y_%7B%5Ctext%7Bref%7D%7D(%5Ctheta))) with a variable.
+To follow the path, the position of the car must be linked to a point on the path, which is the arc-length ![theta_p](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta_%5Cmathcal%7BP%7D). However, it is computationally too expensive to find the true arc-length ![theta_p](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta_%5Cmathcal%7BP%7D), so instead we introduce a new state ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta) which approximates the arc length. This approximation is given by a double integrator:
+
+![](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta=%5Cint_%7B0%7D%5E%7Bt%7D%5Cdot%7B%5Ctheta%7Ddt=%5Cint_%7B0%7D%5E%7Bt%7Dv_%7B%5Ctheta%7Ddt=%5Cint_%7B0%7D%5E%7Bt%7D%5Cint_%7B0%7D%5E%7Bt%7D%5Cdot%7Bv_%7B%5Ctheta%7D%7Ddtdt)
+
+- ![thetadot = v_theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%5Ctheta=v_%5Ctheta), the velocity of the car relative to the reference path
+
+- ![v_theta dot = del v_theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7Bv%7D_%5Ctheta=%5CDelta%20v_%5Ctheta), the acceleration of the car relative to the reference path
+
+Note that ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta) is the double integral of  acceleration, which results in a position.
+
+<br>
+
+
+To keep ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta) as a good approximation of the true ![theta_p](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta_%5Cmathcal%7BP%7D), we construct a cost function which minimizes the error, given by:
+
+![J cost eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DJ(%5Cmathbf%7Bx%7D)=q_c%5Chat%7Be%7D_%7Bc%7D%5E2&plus;q_l%5Chat%7Be%7D_%7Bl%7D%5E2-%5Cgamma%20v_%7B%5Ctheta%7D)
+
+<br>
+
+With parameters:
+- ![e_c](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_c), the contouring error, the error perpendicular to the reference path
+
+    - ![e_c eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_c(X,Y,%5Ctheta)=%5Csin(%5CPhi(%5Ctheta))(X-X_%7B%5Ctext%7Bref%7D%7D(%5Ctheta))-%5Ccos(%5CPhi(%5Ctheta)(Y-Y_%7B%5Ctext%7Bref%7D%7D(%5Ctheta)))
+
+        - ![Phi(theta)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5CPhi(%5Ctheta)), the angle of the tangent to the reference path at point ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta)
+
+<br>
+
+- ![e_l](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_l), the lag error, the error along to the reference path
+
+    - ![e_c eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_l(X,Y,%5Ctheta)=-%5Ccos(%5CPhi(%5Ctheta))(X-X_%7B%5Ctext%7Bref%7D%7D(%5Ctheta))-%5Csin(%5CPhi(%5Ctheta)(Y-Y_%7B%5Ctext%7Bref%7D%7D(%5Ctheta)))
+
+        - ![Phi(theta)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5CPhi(%5Ctheta)), the angle of the tangent to the reference path at point ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta)
+
+<br>
+
+- ![q_c, q_l, gamma](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dq_c,q_l,%5Cgamma%20), weights ![>= 0](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cgeq%200) on the objectives
+
+Note that this cost function minimizes the errors ![e_l](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_l) and ![e_c](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Chat%7Be%7D_c) while maximizing the velocity along the path ![v_theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%20v_%5Ctheta).
+
+This image shows how the error looks on the path.
+
+![Contour Formulation errors](/img/contour_formulation.png)
+
+<br>
+
+### Cost functions
+We can construct further cost functions that help to choose the optimal future. The first is a penalty to control inputs:
+
+![control penalty eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DR(%5Cmathbf%7Bu%7D,%5CDelta%5Cmathbf%7Bu%7D)=%5Cmathbf%7Bu%7D%5ET%5Cmathbf%7BR%7D_%5Cmathbf%7Bu%7D%5Cmathbf%7Bu%7D&plus;%5CDelta%5Cmathbf%7Bu%7D%5ET%5Cmathbf%7BR%7D_%7B%5CDelta%5Cmathbf%7Bu%7D%7D%5CDelta%5Cmathbf%7Bu%7D)
+
+The second is a slip slide angle cost, which controls the aggressiveness of the MPC:
+
+![slip slide angle cost eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DL(%5Cmathbf%7Bx%7D)=q_%5Cbeta(%5Cbeta_%7B%5Ctext%7Bkin%7D%7D-%5Cbeta_%7B%5Ctext%7Bdyn%7D%7D)%5E2)
+
+<br>
+
+The parameters for these two cost functions are:
+
+- ![R_u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cmathbf%7BR%7D_%5Cmathbf%7Bu%7D), a matrix which defines the cost of each control input
+
+- ![R_del u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cmathbf%7BR%7D_%5Cmathbf%7B%5CDelta%20u%7D), a matrix which defines the cost of changing each control input
+
+
+- ![beta_kin](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cbeta_%5Ctext%7Bkin%7D), the kinematic slide slip angle
+
+    - ![beta_kin = arctan(tan(delta)l_R / l_R + l_F)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cbeta_%5Ctext%7Bkin%7D=%5Carctan%5Cleft(%7B%5Cfrac%7B%5Ctan%7B(%5Cdelta)%7Dl_R%7D%7Bl_R&plus;l_F%7D%7D%5Cright))
+
+- ![beta_dyn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cbeta_%5Ctext%7Bdyn%7D), the dynamic slide slip angle
+
+    - ![beta_dyn = arctan(v_y/v_x)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cbeta_%5Ctext%7Bdyn%7D=%5Carctan%7B%5Cleft(%5Cfrac%7Bv_y%7D%7Bv_x%7D%5Cright)%7D)
+
+
+<br>
+
+### Tire constraints
+To simplify the dynamical bicycle model, it was assumed that combined slip can be neglected. However, this is not strictly true. A tire has a maximum elliptice force budget it can transfer to the ground, called the friction ellipse. This budget can be introduced as a constraint, which allows us to ignore combined slip in our dynamical model. The constraints are given by:
+
+![tire eqn 1](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_%7BR,y%7D%5E2&plus;(p_%7B%5Ctext%7Blong%7D%7DF_%7BR,x%7D)%5E2%5Cleq(p_%7B%5Ctext%7Bellipse%7D%7DD_R)%5E2%20)
+
+
+![tire eqn 2](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DF_%7BF,y%7D%5E2&plus;(p_%7B%5Ctext%7Blong%7D%7DF_%7BF,x%7D)%5E2%5Cleq(p_%7B%5Ctext%7Bellipse%7D%7DD_F)%5E2%20)
+
+with parameters
+
+- ![p_long](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dp_%7B%5Ctext%7Blong%7D%7D), tire specific ellipse parameter. Lowering this parameter allows the vehicle to corner more while accelerating
+
+- ![p_ellipse](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dp_%7B%5Ctext%7Bellipse%7D%7D), tire specific ellipse parameter. Increasing this parameter allows the vehicle to go closer to the force limit
+
+
+### Track constraints
+We must add constraints to the MPC problem that tell it to stay within the track boundaries. The constraint is given by:
+
+![track eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D(X-X_%7B%5Ctext%7Bcen%7D%7D(%5Ctheta))%5E2&plus;(Y-Y_%7B%5Ctext%7Bcen%7D%7D(%5Ctheta))%5E2%5Cleq%20R_%7B%5Ctext%7BTrack%7D%7D(%5Ctheta)%5E2&plus;S_c)
+
+with parameters:
+- ![R_Track(theta)](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DR_%7B%5Ctext%7BTrack%7D%7D(%5Ctheta)), the safe radius around the track at point ![theta](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Ctheta).
+
+- ![S_c](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DS_c), a slack variable to soften the constraint, which may be needed to guarantee the equation is solvable
+
+<br>
+
+With the addition of a slack variable ![S_c](https://latex.codecogs.com/svg.image?\color%7Bwhite%7DS_c), we can define a final cost function:
+
+![C(S_c) = q_s S_c + q_ss S_c^2](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%20C(S_%7Bc%7D)=q_s%20S_%7Bc%7D&plus;q_%7Bss%7DS_%7Bc%7D%5E2)
+
+with parameters:
+
+- ![q_s, q_ss](https://latex.codecogs.com/svg.image?\color%7Bwhite%7Dq_s,q_%7Bss%7D), weights ![>= 0](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cgeq%200) that penalize the use of the slack variable
+
+<br>
+
+## Final MPC Problem
+Finally, we can construct our MPC problem. We can combine vehicle model, input dynamics, and arc-length dynamics into one equation:
+
+![xfinal eqn](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cdot%7B%7B%5Cmathbf%7Bx%7D%7D%7D=%5Cbegin%7Bbmatrix%7D%5Cdot%7B%5Ctilde%7B%5Cmathbf%7Bx%7D%7D%7D%5C%5C%5Cdot%7B%5Ctheta%7D%5C%5C%5Cdot%7B%5Cmathbf%7Bu%7D%7D%5Cend%7Bbmatrix%7D=%5Cbegin%7Bbmatrix%7D%5Ctilde%7Bf%7D(%5Cmathbf%7B%5Ctilde%7B%5Cmathbf%7Bx%7D%7D%7D,%5Cmathbf%7B%5Ctilde%7B%5Cmathbf%7Bu%7D%7D%7D,%5CDelta%5Ctilde%7B%5Cmathbf%7Bu%7D%7D)%5C%5Cv_%5Ctheta%5C%5C%5CDelta%5Cmathbf%7Bu%7D%5Cend%7Bbmatrix%7D=f(%7B%5Cmathbf%7Bx%7D%7D,%5CDelta%5Cmathbf%7Bu%7D))
+
+We then discretize the system as:
+
+![](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%7B%5Cmathbf%7Bx%7D%7D_%7Bk&plus;1%7D=f(%5Cmathbf%7Bx%7D_%7Bk%7D,%5CDelta%5Cmathbf%7Bu%7D_k))
+
+Which allows us to write our final MPC problem, with a prediction horizon of N:
+
+![final problem!!](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cbegin%7Balign%7D%5Cmin_%7B%5CDelta%5Cmathbf%7Bu%7D%7D%5Chspace%7B0.5cm%7D&%5Csum_%7Bk=0%7D%5EN%20J(%5Cmathbf%7Bx%7D_k)&plus;R(%5Cmathbf%7Bu%7D_k,%5CDelta%5Cmathbf%7Bu%7D_k)&plus;L(%5Cmathbf%7Bx%7D_k)&plus;C(S_%7Bc,k%7D)%5Cnonumber%5C%5Cs.t.%5Chspace%7B0.5cm%7D&%5Cmathbf%7Bx%7D_0=%5Cmathbf%7Bx%7D(0),%5Cnonumber%5C%5C&%5Cmathbf%7Bx%7D_%7Bk&plus;1%7D=f(%5Cmathbf%7Bx%7D_k,%5CDelta%5Cmathbf%7Bu%7D_k),%5Cnonumber%5C%5C&(X_k-X_%7B%5Ctext%7Bcen%7D,k%7D)%5E2&plus;(Y_k-Y_%7B%5Ctext%7Bcen%7D,k%7D)%5E2%5Cleq%20R_%7B%5Ctext%7BTrack%7D,k%7D%5E2&plus;S_%7Bc,k%7D,%5Cnonumber%5C%5C&F_%7BR,y,k%7D%5E2&plus;(p_%7B%5Ctext%7Blong%7D%7DF_%7BR,x,k%7D)%5E2%5Cleq(p_%7B%5Ctext%7Bellipse%7D%7DD_R)%5E2,%5Cnonumber%5C%5C&F_%7BF,y,k%7D%5E2&plus;(p_%7B%5Ctext%7Blong%7D%7DF_%7BF,x,k%7D)%5E2%5Cleq(p_%7B%5Ctext%7Bellipse%7D%7DD_F)%5E2,%5Cnonumber%5C%5C&%5Cmathbf%7Bu%7D_%7B%5Ctext%7Bmin%7D%7D%5Cleq%5Cmathbf%7Bu%7D_k%5Cleq%5Cmathbf%7Bu%7D_%7B%5Ctext%7Bmax%7D%7D,%5Cnonumber%5C%5C&%5CDelta%5Cmathbf%7Bu%7D_%7B%5Ctext%7Bmin%7D%7D%5Cleq%5CDelta%5Cmathbf%7Bu%7D_k%5Cleq%5CDelta%5Cmathbf%7Bu%7D_%7B%5Ctext%7Bmax%7D%7D%5Cend%7Balign%7D)
+
+
+Our MPC problem can now be solved using an optimization solver. The output is ![delta u](https://latex.codecogs.com/svg.image?\color%7Bwhite%7D%5Cmathbf%7B%5CDelta%20u%7D), which we can apply to our control inputs.
+
+
+
+## Optimization package
+### TBD
