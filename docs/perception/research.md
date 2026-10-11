@@ -1,11 +1,11 @@
 ---
 
-sidebar_position: 1
+sidebar_position: 2
+description: Guiding papers, future methods, etc.
 
 ---
 
-
-# Perception Research 
+# Research 
 
 This is where we will compile new possible methods and algorithms for the perception team. Feel free to add sources here. When you do please leave a short description of the method and how we can use it for WUAIR.
 
