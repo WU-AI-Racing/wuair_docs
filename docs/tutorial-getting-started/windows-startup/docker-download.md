@@ -46,6 +46,6 @@ verify with `docker --version`
 
 :::tip[Next Steps]
 
-You should get a version and build specification from the previous command. If that and docker desktop gave you no issues, move onto [GitHub Basics](./Github-Basics.md)
+You should get a version and build specification from the previous command. If that and docker desktop gave you no issues, move onto [GitHub SSH Setup](../github-ssh-setup.md) (inside WSL) if you have not done it yet, then [Clone and build](./using-docker-plus-ros.md)
 
 :::

@@ -1,167 +1,85 @@
 ---
-
 sidebar_position: 10
-
 ---
 
 # Mac Setup
 
-## Pre-req Installation
+Only the Docker setup is Mac-specific. Once it is done, building and running the stack is identical to Linux: follow [Running the Stack](/docs/Development/running-the-stack.md).
 
-### Homebrew Package Manager  
+## 1. Install prerequisites
 
-You will need a package manager to install the necessary dependencies for our software set up. Open terminal then past the follow command into the terminal:
+First do the shared [GitHub SSH Setup](./github-ssh-setup.md) (git, SSH key, test). Optionally install [Homebrew](https://brew.sh) for other tools.
 
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+Download [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/) (Apple Silicon build on M1-M4, Intel build otherwise), version 4.25 or newer.
 
-To install packages use `brew install <package>`
+## 2. Configure Docker Desktop
 
-### Docker Desktop
-Download [Docker Desktop](https://www.docker.com/products/docker-desktop/) for the architecture you have on your computer.
+1. **Settings → General** (Apple Silicon only): confirm **Use Rosetta for x86_64/amd64 emulation on Apple Silicon** is checked. It is often on by default in recent versions, but if it is off Docker falls back to the much slower QEMU. It needs macOS 13+ and the Apple Virtualization framework as the VMM. Intel Macs can skip this.
+2. **Settings → Resources → Network:** check **Enable host networking** (every container uses `network_mode: host`).
+3. **Settings → Resources:** give Docker at least 6 CPUs and 8 GB RAM; the Gazebo image is heavy.
+4. Apply & Restart.
 
-## Installation
-
-### 1. Create a working directory
-
-```
-mkdir ~/wuair
-cd ~/wuair
-```
-
-### 2. Clone the system repository
-
-```
-git clone https://github.com/WU-AI-Racing/wuair_system.git
-cd wuair_system
-```
----
-
-## Docker Setup (VNC)
-
-The system provides a **web-based VNC environment** with ROS 2 Humble and XFCE.
-
-### 1. Build the Docker image
-To build the image and start both the ROS environment and the VNC server in the background, run the following command from the root of the repository:
+Make sure macOS itself has Rosetta 2 (a no-op if it is already installed):
 
 ```bash
-docker compose --profile mac up -d --build
+softwareupdate --install-rosetta --agree-to-license
 ```
 
-### 2. Access the desktop
+Why Rosetta: Gazebo Classic 11 has no arm64 build, so `dev_gui` is pinned to `linux/amd64` and runs under CPU translation. Graphics are software-rendered inside the container and shown through your browser (noVNC), so nothing touches the macOS OpenGL stack. Expect a slow sim (roughly 3-15 fps).
 
-Open your browser and navigate to:
+## 3. Clone
+
+Requires the SSH key from [GitHub SSH Setup](./github-ssh-setup.md).
 
 ```bash
-http://localhost:6080/vnc.html
+mkdir ~/wuair && cd ~/wuair
+git clone git@github.com:WU-AI-Racing/wuair_v2.git
+cd wuair_v2
+git submodule update --init --recursive
 ```
 
-You will have full access to the ROS2 XFCE desktop environment.
+Use the default `main` branch; there is no separate Mac branch anymore.
 
-> **Note:** The VNC server runs without authentication by default. Use only on local or trusted networks.
+## 4. Build (Mac-specific)
 
----
-
-### 3. Run the VNC container after building for the first time
+:::warning Build dev_gui with `--no-cache` on Mac
+Gazebo's dependencies are fragile on macOS and a cached `dev_gui` layer can leave you with Gazebo errors. Build it fresh, either with the script:
 
 ```bash
-docker compose --profile mac up -d
+./scripts/build.sh --profile dev_gui --no-cache
 ```
 
-Open your browser and navigate to:
+or directly:
 
 ```bash
-http://localhost:6080/vnc.html
+docker compose --profile dev_gui build --no-cache dev_gui
 ```
 
-* To stop the container:
+The first build takes ~15 minutes. Then build the rest normally:
 
+```bash
+./scripts/build.sh --profile sensors --profile perception --profile state_est --profile controls
 ```
-docker compose --profile mac down
-```
-
-## Running the Simulation
-
-After connecting via VNC:
-
-1. Open a terminal in the container.
-2. For useful aliases run
-```
-source src/.rosbashrc.sh`
-```
-or if using zsh
-```
-source src/.roshzshrc
-```
-That will give you the following short-cut commands:
-
-:::tip
-
-Don't paste this into your terminal. This is just a list of the commands and the alias contained in the contrainer.
 :::
 
-```
-# Source ROS 2 and your workspace
-alias .r='source /opt/ros/humble/setup.bash'
-alias .w='source /ros2_ws/install/setup.bash'
-alias .ws='cd /ros2_ws'
-alias eufs='ros2 launch eufs_launcher eufs_launcher.launch.py'
-alias wuair_gui='ros2 run wuair_launcher gui'
+:::danger Build `controls` with the script, not raw `docker compose build`
+The `controls` container bind-mounts `controls/install/` over the image's workspace. That folder is not in git, so on a fresh clone it is empty and would hide the built packages, and the container would crash on start. `./scripts/build.sh` copies `install/` out of the freshly built image for you. If you ever built `controls` another way, fix it with:
 
-# Build and clean
-alias cb='cd /ros2_ws && colcon build'
-alias cbc='cd /ros2_ws && rm -rf build install log && colcon build'
-alias cl='cd /ros2_ws && rm -rf build install log'1
-
-# List ROS environment info
-alias envr='env | grep ROS'
-
-
-# Shortcuts
-alias ll='ls -lah --color=auto'
-alias gs='git status'
-alias gp='git pull'
-alias gd='git diff'
-
-# Run tmux if available
-alias tm='tmux attach || tmux'
-
-# --- Auto-source workspace on container login ---
-if [ -f /opt/ros/humble/setup.bash ]; then
-    source /opt/ros/humble/setup.bash
-fi
-
-# Auto-source your own workspace if it's been built
-if [ -f /ros2_ws/install/setup.bash ]; then
-    source /ros2_ws/install/setup.bash
-fi
-
-export ROS_WORKSPACE=/ros2_ws
-export ROS_DISTRO=humble
-export EUFS_MASTER=/ros2_ws/src/eufs_master
-
+```bash
+./scripts/build.sh --profile controls
 ```
 
-3. Build the workspace:
+Also make sure `git submodule update --init --recursive` ran, or `controls/src/ros_can/FS-AI-API` is empty and the image build fails.
+:::
 
-```
-.r
-colcon build --symlink-install
-.w
-```
+`sensors`, `perception` and `state_est` are still being tested on Mac. If one fails to build, try `--no-cache` for that profile and tell the software lead. For perception on a Mac use `WUAIR_PERCEPTION_MODE=cpu` (the default).
 
-> **Note:** If you see a lot of warning message don't worry. Ignore them and move onto launching the simulation.
+## 5. Run
 
+From here it is identical to every other OS: [Running the Stack](/docs/Development/running-the-stack.md).
 
-4. Launch the simulation:
+## Troubleshooting
 
-```
-ros2 launch eufs_launcher eufs_launcher.launch.py
-```
-
-5. Launch WUAIR file:
-
-```
-ros2 run wuair_launcher gui
-```
+- **`no matching manifest for linux/arm64/v8`**: Rosetta emulation is off (step 2).
+- **Gazebo errors / sim window never appears**: rebuild with the `--no-cache` command in step 4, then `./scripts/down.sh` and relaunch.
+- **Stack never starts driving or topics flicker**: run `./scripts/down.sh` before relaunching after any `.env` change.

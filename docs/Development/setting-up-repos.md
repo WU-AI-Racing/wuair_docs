@@ -1,91 +1,15 @@
 ---
-
 sidebar_position: 1
-
 ---
 
+# Getting Started With ROS Development
 
-`# Getting Started With ROS Development
-
-## Cloning Repositories
-
-Once you have completed the software installation guide and set up Git and Docker you can now begin getting started on writing you own code. Each department will have more detailed development guides but this will allow you to get started. 
-
-Instead of using nested Git repos, called submodules, we use individual repositories for each department. To ensure each repository is up-to-date and using correct branch we will use **vcstool** to automate cloning and pulling.
-`
-:::tip[If these Git terms are unfamiliar please refer to the [Git tutorial](/docs/tutorial-getting-started/what-is-git.md)]
+:::info
+We no longer use per-department repositories or **vcstool**. All code lives in one monorepo, [`wuair_v2`](https://github.com/WU-AI-Racing/wuair_v2).
 :::
 
-To get started you will need to set up an SSH key for github following [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). With the SSH key you can now import each repository in the WUAIR stack and ensure they are up to date. 
+Set up in this order: [GitHub SSH Setup](/docs/tutorial-getting-started/github-ssh-setup.md), then your OS guide ([Windows](/docs/tutorial-getting-started/windows-startup/installing-wsl.md), [Mac](/docs/tutorial-getting-started/mac-stetup.md), [Linux](/docs/tutorial-getting-started/software-installation.md)), which ends with `wuair_v2` cloned and built.
 
-After entering the `ros2_ws` via Docker enter the `/src` directory. 
+Each module has its own folder (`sensors/`, `perception/`, `state_est/`, `controls/`, `dev_gui/`) with its ROS packages under `src/` and its tunable YAML under `config/`. Work on a branch in this one repo; there is no more deleting and re-cloning individual repos.
 
-:::important 
-The /src directory is mounted in the docker container! This means that you can make changes to files within the `/src` on your local machine or within docker and it will remain the same between both.
-:::
-
-Next source ros with
-```
-. /opt/ros/humble/setup.bash
-```
-
-Then clone your the WUAIR stack using `vcstool` by moving to the `src` directory and importing repositors with:
-
-```
-vcs import < wuair.rosinstall
-```
-
-All the packages should now be imported into your `/src` directory. Your only need to run this command when you want to clone the stack. To update packages after this importing them run:
-
-```
-vcs pull src
-```
-
-:::important
-This will pull only the main branch of each repository. 
-:::
-
-
-
-#### To test code in experimental branches the best approach we currently have found the following.
-
-**On your local machine:** 
-1. Delete the repository you want work on. EX: `rm -fr perception_pkg`
-2. Clone the repository you want to work on using git EX: `git clone git@github.com:WU-AI-Racing/wuair_perception.git`
-3. Go to you desired experiment branch with `git checkout BRANCH-NAME`
-
-Then build the ros workspace with:
-
-```
-.r
-colcon build --symlink-install
-.w
-```
-
-or non-aliased commands:
-
-```
-source /opt/ros/humble/setup.bash
-colcon build --symlink-install
-source /ros2_ws/install/setup.bash
-```
-
-Now you should be able to edit files on your local machine and have them update in Docker. After editing files you do not need to rebuild every time because of the simlink, but for major changes or if using C++ you will need to rebuild.
-
-## Running code 
-
-Make sure EUFS is running in another terminal. 
-```
-ros2 launch eufs_launcher eufs_launcher.launch.py
-```
-
-To run components individually (after building) use the following command with you're desired package:
-
-```
-ros2 run wuair_control ros
-```
-
-
-```
-ros2 run wuair_launcher gui
-```
+Then follow [Running the Stack](./running-the-stack.md) to build and launch.

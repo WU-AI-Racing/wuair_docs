@@ -14,19 +14,16 @@ Matching our own software stack the tutorial code is intended to be completed mo
 
 ### Cloning The Repo
 
-To begin clone the following repository to your `wuair/wuair_system/src` directory.
+Follow the setup guide for your OS, which ends with `wuair_v2` cloned and built:
 
-:::tip
-If you are using Windows you will need to start WSL before navigating to this directory. In the terminal run:
-```
-wsl
-cd ~/wuair/wuair_system/src
-```
+* [Windows](/docs/category/windows-setup)
+* [Linux](/docs/tutorial-getting-started/software-installation)
+* [Mac](/docs/tutorial-getting-started/mac-stetup)
 
-:::
+The tutorial code lives in its own repo. Clone it next to `wuair_v2` (not inside it):
 
-Clone the code using:
 ```
+cd ~/wuair
 git clone git@github.com:WU-AI-Racing/wuair_tutorial.git
 ```
 
@@ -34,114 +31,62 @@ git clone git@github.com:WU-AI-Racing/wuair_tutorial.git
 If you are missing branches run `git fetch --all`
 :::
 
-:::note
-If you have any other wuair team repos (perception, state estimation, path planning, control) make sure all local changes are pushed to GitHub and delete them using `rm -fr` before building the ROS workspace.
-:::
-
 ### IDE Setup
 
-Next open that document in your IDE of choice. If you don’t already have one installed we recommend vscode.
-
-:::tip
-To open a directory in vscode use `code <replace_path>`. For your current directory `run code .`
-:::
-
-The `/src` folder is connected both to your local computer and to the Docker container running ROS. This will allow you to edit code and see your changes update live in the ROS workspace.
-
-### Starting Docker
-
-Next start the docker container as described in your operating systems respective guides:
-
-* [Windows](/wuair_docs/docs/category/windows-setup)
-* [Linux](/wuair_docs/docs/tutorial-getting-started/software-installation)
-* [Mac](/wuair_docs/docs/tutorial-getting-started/mac-stetup)
-
-Once you have started the Docker container you are ready to go and can move on to running and writing code!
+Open `wuair_v2` and `wuair_tutorial` in your IDE of choice (we recommend vscode; `code .` opens the current directory). Module source lives under `<module>/src/` and is bind-mounted into its container, so edits on your host show up in the container.
 
 ## Running ROS code & EUFS
 
-To test your code we will be using the physics based EUFS simulator. This will allow you to simulate and visualize autonomously driving a car, as well as ROS topics you publish.
+To test your code we use the physics based EUFS simulator, which lets you watch the car drive and visualize the ROS topics you publish in [RViz](https://docs.ros.org/en/rolling/Tutorials/Intermediate/RViz/RViz-User-Guide/RViz-User-Guide.html).
 
 :::tip
-If you are confused about any of the ROS terminology please see the [What is ROS?]() guide
+If you are confused about any of the ROS terminology please see the [What is ROS?](/docs/tutorial-getting-started/what-is-ros.md) guide
 :::
 
-To see the car model and ROS topics in 3D the simulator uses the open source [RViz](https://docs.ros.org/en/rolling/Tutorials/Intermediate/RViz/RViz-User-Guide/RViz-User-Guide.html) software.
-
-To start we will build the ROS work space. If you would like to use aliased shortcut commands to reduce typing source the provided bashrc file with the following command: `source src/.rosbashrc.sh`.
-
-First we need to run `.r` or `source /opt/ros/humble/setup.bash` depending on if you are using the regular or aliased commands.
-
-Next we need to build the work space by running: 
+Start the sim and the stack as described in [Running the Stack](/docs/Development/running-the-stack.md):
 
 ```
-colcon build --symlink-install
-```
-Then run `.w` or `source /ros2_ws/install/setup.bash`
-
-If the build finishes then you are good to go! It should succeed initially before you write any code, but as you develop you may introduce errors that stop the ROS workspace from building. In that case you should look at the error messages and fix any problems.
-
-Next we will run the EUFS simulator with the following command:
-```
-ros2 launch eufs_launcher eufs_launcher.launch.py
+./scripts/launch_sim.sh
+./scripts/real_launch.sh
 ```
 
-When the GUI pops up select the following options: If you are testing perception, uncheck the “Use Simulated Perception” box as shown below.
+Open `http://localhost:6080/vnc.html`. In the EUFS launcher select the options below. If you are testing perception, uncheck the "Use Simulated Perception" box.
 
 ![EUFS Launcher](/img/EUFS_launcher.png)
 
-This will allow you to access the raw LiDAR data we use for the clustering based cone identification algorithm in this tutorial instead of using EUFS’s own perception algorithm which simply publishes to the `/cones` topic. 
+This gives you the raw LiDAR data used by the clustering-based cone detection in this tutorial instead of EUFS's own perception, which simply publishes to `/cones`.
 
-To visualize other topics first click add in the bottom left of the window:
+To visualize other topics click add in the bottom left of RViz:
 
 ![Add button](/img/add_button.png)
 
-Then switch to the topics tab in the pop up menu and select a topic to visualize. For the perception alogirhtm we are cluster the Velodyne LiDAR data so I may be useful to visualize. You will do a similar process when adding your custom path planning visualization.
+Then switch to the topics tab and select a topic, for example the Velodyne LiDAR points.
 
 ![Add topic](/img/add_topic.png)
 
 :::tip
-I recommend using the EUFS simulated perception for testing the state estimation, path planning, and control modules if you are having trouble with the tutorial perception.
+Use the EUFS simulated perception for testing state estimation, path planning and control if you are having trouble with the tutorial perception.
 :::
-
 
 ## Coding Assignments
 
 For each module open the directory corresponding to the team, i.e. `/perception`. In each module’s directory there will be another sub directory called `<module name>/<module name>_pkg/`. This will contain the two files you will need to work on for each module. The first is the logic and algorithms of the node contained in the python file named after the module. The other file is the ROS 2 node which may or may not have a task to complete depending on the module. Once you complete the missing code under each TODO will be ready to build and test your code.
 
-To build use:
+Rebuild after changing source (see [Running the Stack](/docs/Development/running-the-stack.md)):
+
 ```
-colcon build --symlink-install
+./scripts/build.sh --profile <module>
 ```
 
-The symlink will allow you to make changes to your files and test them without rebuilding. However, if you make major changes such as modifying the inputs of a function or deleting a variable you may have to rebuild.
+Config YAML changes only need `docker compose restart wuair_<module>`.
 
-Now with EUFS open in one terminal open a new terminal in the docker container. First, outside of the docker container go to `wuair/wuair_system`. 
+To run or inspect a single node, open a shell in its container:
 
-Then run:
 ```
-docker-compose exec humble bash. 
+docker exec -it wuair_controls bash
 ```
-This should open a new terminal within our container.
 
-:::note
-You will need to re-source the bashrc files with `source src/.rosbashrc.sh` and run `.r` again.
-:::
-
-Now you can run any of the nodes as follows:
-
-* Perception: `ros2 run perception_pkg perception`
-
-* State estimation: `ros2 launch state_estimation_pkg slam_launch.py`
-
-* Path planning: `ros2 run path_planning_pkg planner`
-
-* Control: `ros2 run control_pkg control`
-
-**For convenience you can also use the GUI launch script to avoid excessive terminals:**
-```
-ros2 run wuair_launcher gui
-```
+Container names are `wuair_sensors`, `wuair_perception`, `wuair_state_est`, `wuair_controls`. To see every node's output, attach to its tmux with `docker exec -it wuair_controls tmux attach -t controls`.
 
 ### Perception
 
