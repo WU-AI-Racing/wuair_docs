@@ -7,7 +7,7 @@ sidebar_position: 0
 Do this once, on every OS, before the OS-specific Docker and clone steps. We clone `wuair_v2` over SSH.
 
 :::important Windows: do this inside WSL
-Open a WSL terminal (run `wsl` in PowerShell) and run every command below there, not in PowerShell. The key must live in the WSL home folder (`~/.ssh`), because that is where you will clone and build. Install WSL first: [Installing WSL](./windows-startup/installing-wsl.md).
+Open a WSL terminal (run `wsl -d Ubuntu-22.04` in PowerShell) and run every command below there, not in PowerShell. The key must live in the WSL home folder (`~/.ssh`), because that is where you will clone and build. Install WSL first: [Installing WSL](./windows-startup/installing-wsl.md).
 :::
 
 ## 1. Install git
@@ -28,7 +28,7 @@ git config --global user.email "you@example.com"
 ssh-keygen -t ed25519 -C "you@example.com"
 ```
 
-Press Enter to accept `~/.ssh/id_ed25519`. A passphrase is optional. Already have a key you use with GitHub? Skip this and use it.
+Press Enter to accept `~/.ssh/id_ed25519`. A passphrase is optional. If you already have a key you use with GitHub skip this and use it.
 
 ## 3. Add it to GitHub
 
@@ -54,4 +54,3 @@ The first time, type `yes` to trust GitHub. You should see `Hi <username>! You'v
 | Mac | [Mac Setup](./mac-stetup.md) |
 | Linux | [Linux Setup](./software-installation.md) |
 
-Every path ends at [Running the Stack](/docs/Development/running-the-stack.md).

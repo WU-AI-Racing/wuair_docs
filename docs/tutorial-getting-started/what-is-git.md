@@ -100,7 +100,7 @@ We will now be cloning the repository (repo) using an SSH connection. Repositori
 
 ```bash
 
-git clone git@github.com:WU-AI-Racing/wuair_system.git
+git clone git@github.com:WU-AI-Racing/wuair_v2.git
 
 cd wuair_system && git checkout your_branch_here # move to desired branch
 
