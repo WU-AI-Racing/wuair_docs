@@ -33,13 +33,13 @@ From now on everything, unless stated otherwise, should be run from WSL. If you 
 
 Now that you have WSL, in a powershell terminal, run
 ```powershell
-wsl
+wsl -d Ubuntu-22.04
 ```
 This will take you to WSL (likely Ubuntu, a distribution of Linux) land, where everything is linux. This will help a lot when it comes to getting the display forwarding set up, since WSL will take the display from our Docker image and handle the translation for us. Think of them like a necessary middleman. 
 
 install docker using your package manager of choice. e.g.:
 ```bash 
-sudo snap install docker
+sudo apt update && sudo apt install docker
 ```
 verify with `docker --version`
 

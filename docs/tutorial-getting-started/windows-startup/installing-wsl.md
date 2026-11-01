@@ -16,7 +16,15 @@ You will need Windows 11 or some later iteration of Windows 10. Aside from that,
 
 ## WSL Install
 
-get [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (really just run the first command you see). To ensure you have GUI rendering capabilities, run this in a windows powershell terminal:
+get [WSL](https://learn.microsoft.com/en-us/windows/wsl/install):
+
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+In this case we only need Ubuntu 22.04, the distro compatible with our ROS2 Humble, the version of ROS that we use.
+
+To ensure you have GUI rendering capabilities, run this in a windows powershell terminal:
 ```powershell
 wsl --version
 ```

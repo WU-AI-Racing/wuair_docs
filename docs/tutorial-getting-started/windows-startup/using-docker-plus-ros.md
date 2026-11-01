@@ -7,7 +7,7 @@ image: "/img/ros-logo.jpg"
 
 :::tip[Reminder for help]
 
-remember getting help is an email away. Don't spend 5 hours on a problem that might be a 5 minute fix. It is okay and expected for you to have problems. The link for getting in contact with us is [here](./help-me.md). You can always also contact your team lead.
+remember getting help is an dm away. Don't spend 5 hours on a problem that might be a 5 minute fix. It is okay and expected for you to have problems. The link for getting in contact with us is [here](./help-me.md). You can always also contact your team lead.
 
 :::
 
@@ -19,7 +19,6 @@ Run everything below **inside WSL** (Ubuntu).
 mkdir -p ~/wuair && cd ~/wuair
 git clone git@github.com:WU-AI-Racing/wuair_v2.git
 cd wuair_v2
-git submodule update --init --recursive
 sudo usermod -aG docker $USER   # then close and reopen your WSL terminal
 ./scripts/build.sh              # takes a while the first time
 ```

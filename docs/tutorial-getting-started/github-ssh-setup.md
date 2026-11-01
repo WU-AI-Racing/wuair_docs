@@ -15,7 +15,7 @@ Open a WSL terminal (run `wsl -d Ubuntu-22.04` in PowerShell) and run every comm
 - **Linux / WSL (Ubuntu):** `sudo apt update && sudo apt install -y git`
 - **Mac:** `xcode-select --install` (or `brew install git`)
 
-Set your identity:
+Set your identity (you only need to do this once and the email doesn't need to be the same as your GitHub):
 
 ```bash
 git config --global user.name "Your Name"
